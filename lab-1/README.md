@@ -178,19 +178,168 @@ trace to 192.168.3.3, 8 hops max (ICMP), press Ctrl+C to stop
 VPC-A>
 
 ```
+``
+R-1 show ip route ospf
+``
+```
+R-1#             show ip route ospf | beg Gateway
+Gateway of last resort is not set
+
+      2.0.0.0/32 is subnetted, 1 subnets
+O        2.2.2.2 [110/11] via 10.1.1.2, 04:01:35, Ethernet0/0
+      3.0.0.0/32 is subnetted, 1 subnets
+O        3.3.3.3 [110/21] via 10.1.1.2, 03:56:26, Ethernet0/0
+      10.0.0.0/8 is variably subnetted, 3 subnets, 2 masks
+O        10.2.2.0/30 [110/20] via 10.1.1.2, 04:01:35, Ethernet0/0
+O     192.168.3.0/24 [110/30] via 10.1.1.2, 03:49:44, Ethernet0/0
+
+```
+``
+R-2 show ip route ospf
+``
+```
+R-2#show ip route ospf | beg Gateway
+Gateway of last resort is not set
+
+      1.0.0.0/32 is subnetted, 1 subnets
+O        1.1.1.1 [110/11] via 10.1.1.1, 04:05:33, Ethernet0/2
+      3.0.0.0/32 is subnetted, 1 subnets
+O        3.3.3.3 [110/11] via 10.2.2.2, 04:01:25, Ethernet0/3
+O     192.168.1.0/24 [110/20] via 10.1.1.1, 03:51:48, Ethernet0/2
+O     192.168.3.0/24 [110/20] via 10.2.2.2, 03:54:42, Ethernet0/3
+R-2#
+```
+``
+R-3 show ip route ospf
+``
+```
+R-3#show ip route ospf | beg Gateway
+Gateway of last resort is not set
+
+      1.0.0.0/32 is subnetted, 1 subnets
+O        1.1.1.1 [110/21] via 10.2.2.1, 04:00:18, Ethernet0/0
+      2.0.0.0/32 is subnetted, 1 subnets
+O        2.2.2.2 [110/11] via 10.2.2.1, 04:00:18, Ethernet0/0
+      10.0.0.0/8 is variably subnetted, 3 subnets, 2 masks
+O        10.1.1.0/30 [110/20] via 10.2.2.1, 04:00:18, Ethernet0/0
+O     192.168.1.0/24 [110/30] via 10.2.2.1, 03:50:36, Ethernet0/0
+R-3#
+```
 </details>
 </summary>
 
 <details>
-
-#### Проверка проводится на R-1
-
 <summary>Проверка административных ролей</summary
-
 
 ``
 Проверка проводится на R-1
 ``
+
+```
+R-1>en
+Password:
+R-1#enable view admin1
+Password:
+
+R-1#show parser view
+Current view is 'admin1'
+
+R-1#?
+Exec commands:
+  configure   Enter configuration mode
+  credential  load the credential info from file system
+  do-exec     Mode-independent "do-exec" prefix support
+  enable      Turn on privileged commands
+  exit        Exit from the EXEC
+  show        Show running system information
+
+R-1#show ?
+  aaa                       Show AAA values
+  access-expression         List access expression
+  access-lists              List access lists
+  acircuit                  Access circuit info
+  adjacency                 Adjacent nodes
+  aliases                   Display alias commands
+  alps                      Alps information
+  appfw                     Application Firewall information
+  application               Application Routing
+  archive                   Archive functions
+  arp                       ARP table
+  async                     Information on terminal lines used as router
+                            interfaces
+  authentication            Shows Auth Manager registrations or sessions
+  auto                      Show Automation Template
+  backhaul-session-manager  Backhaul Session Manager information
+  backup                    Backup status
+  banner                    Display banner information
+  beep                      Show BEEP information
+  bfd                       BFD protocol info
+  bgp                       BGP information
+  bootvar                   Boot and related environment variable
+
+R-1#
+
+
+```
+
+```
+R-1#enable view admin2
+Password:
+
+R-1#show  parser view
+Current view is 'admin2'
+
+R-1#?
+Exec commands:
+  credential  load the credential info from file system
+  do-exec     Mode-independent "do-exec" prefix support
+  enable      Turn on privileged commands
+  exit        Exit from the EXEC
+  show        Show running system information
+
+R-1#
+
+```
+
+```
+R-1#enable view tech
+Password:
+
+R-1#show  parser view
+Current view is 'tech'
+
+R-1#?
+Exec commands:
+  credential  load the credential info from file system
+  do-exec     Mode-independent "do-exec" prefix support
+  enable      Turn on privileged commands
+  exit        Exit from the EXEC
+  show        Show running system information
+
+R-1#show ?
+  banner      Display banner information
+  disk0:      display information about disk0: file system
+  disk1:      display information about disk1: file system
+  interfaces  Interface status and configuration
+  ip          IP information
+  parser      Display parser information
+  unix:       display information about unix: file system
+  version     System hardware and software status
+
+R-1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+Ethernet0/0                10.1.1.1        YES manual up                    up
+Ethernet0/1                192.168.1.1     YES manual up                    up
+Ethernet0/2                unassigned      YES unset  administratively down down
+Ethernet0/3                unassigned      YES unset  administratively down down
+Loopback0                  1.1.1.1         YES manual up                    up
+R-1#show ip route
+            ^
+% Invalid input detected at '^' marker.
+
+R-1#
+```
+
 
 </details>
 </summary>
