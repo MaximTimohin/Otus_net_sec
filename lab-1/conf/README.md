@@ -1,1 +1,1 @@
-R-1 [config.conf](./R-1.conf)
+[R-1 config](./R-1.conf)
