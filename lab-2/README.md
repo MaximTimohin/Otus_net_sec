@@ -1,19 +1,18 @@
-#### Административные роли.
+#### Управление и мониторинг сетевых устройств.
 ###  
 
 
 
 
 ##### Цель:
-* Базовая настройка сетевых устройств.
-* Настрояка IP адресов и маршутизации.
-* Настройка авторизации команд с использованием уровней привилегий и интерфейса командной строки на основе ролей.
+* Реализовать безопасное управление и мониторинг сетевых устройств
+ - Натроим службы Syslog, NTP, SNMP
 
 
 
 #### Схема сети:
 
-  ![alt-текст](/lab-1/img/map1.png)
+  ![alt-текст](/lab-2/img/map-2.png)
 
   #### Схема коммутации и IP
   <details>
@@ -24,6 +23,7 @@
   |R-1|Loopback0|1.1.1.1/24||
   |R-1|Ethernet0/1|192.168.1.1/24|link SW-1_e0/0|
   |R-1|Ethernet0/0|10.1.1.1/30|link R-2_e0/2|
+  |R-1|Ethernet0/2|10.1.2.1/24|link Net_Cloud|
   ||
   |R-2|Loopback0|2.2.2.2/24||
   |R-2|Ethernet0/2|10.1.1.2/30|link R-1_e0/0|
@@ -51,98 +51,77 @@
   ### Настройка:
 
   <details>
-  <summary>Базовая настройка</summary>
+  <summary>Настройка Syslog, NTP, SNMP</summary>
 
-  #### Ниже приведены часть комманд базовой настройки устройства, полные настройки можно посмотреть в файле конфигурации по ссылке ниже.
+``
+Ниже приведена часть настроек R-1, полные настройки можно посмотреть в файле конфигукации. На остальных устройствах сделаны аналогичные настройки.
+``
 
 [файлы конфигурации](./conf/README.md)
 
-  ```
-  ip domain-name otuslab.ru
+``
+SNMP
+``
+```
+snmp-server community OtusLabRO RO
+snmp-server host 7.7.7.7 version 2c OtusLabRO
+```
+``
+Syslog
+``
+```
+snmp-server community OtusLabRO RO
+snmp-server host 7.7.7.7 version 2c OtusLabRO
+```
+``
+NTP
+``
+```
+ntp authentication-key 1 md5 06091B345F42081B 7
+ntp authenticate
+ntp server 7.7.7.7
+```
 
-  hostname R-1
-  no ip domain lookup
-  no ip http server
-  no ip http secure-server
-
-  service password-encryption
-  aaa new-model
-  banner motd c LOGIN or LEAVE, ACCESS is DENIED!!! c
-  security passwords min-length 6
-  security authentication failure rate 10 log
-  clock timezone MSK 3 0
-  ```
-  </details>
+</details>
 </summary>
 
 <details>
-<summary>Настройка маршрутизации</summary>
+<summary>Настройка R-1</summary>
 
-#### Настройки IP на интерфейсах можно посмотреть в файлах конфигурации, они соответствуют схеми сети.
+#### Ниже приведена часть настроек R-1, полные настройки можно посмотреть в файле конфигукации.
+``
+Минимальная длинна пароля сознатнельно сделана 6 знаков т.к. в домашней работе стоит задача настроить сам функцонал.
+``
 
 [файлы конфигурации](./conf/README.md)
 
 ```
-R-1
-
-router ospf 1
- router-id 1.1.1.1
- passive-interface Ethernet0/1
- network 1.1.1.0 0.0.0.255 area 0
- network 10.1.1.0 0.0.0.3 area 0
- network 192.168.1.0 0.0.0.255 area 0
-
-R-2
-
-router ospf 1
- router-id 2.2.2.2
- network 2.2.2.0 0.0.0.255 area 0
- network 10.1.1.0 0.0.0.3 area 0
- network 10.2.2.0 0.0.0.3 area 0
-
-
-R-3
-
-router ospf 1
- router-id 3.3.3.3
- passive-interface Ethernet0/1
- network 3.3.3.0 0.0.0.255 area 0
- network 10.2.2.0 0.0.0.3 area 0
- network 192.168.3.0 0.0.0.255 area 0
-
+service password-encryption
+hostname R-1
+security authentication failure rate 10 log
+security passwords min-length 6
+enable secret 9 $9$AmBka6PnVqs/tq$AlLlk.nt7XkoaAgIMnH8861aOFXiBiP6QPstKu1Hepc
+no ip domain lookup
+ip domain name otuslab.ru
+username user01 secret 9 $9$heaj04nf2ZQzna$yip57i38QXr6NjkXGuKXvp50bVo.mg4q0zvwtcVIGL.
+username admin privilege 15 secret 9 $9$ay0V5s1VhXDw7a$Fo4Lr019/Y/mGp/Jm5bEW0VRrlaROJtRwCIUIyBCoHs
 
 ```
 </details>
 </summary>
 
 <details>
-<summary>Настройка административных ролей</summary>
+<summary>Настройка R-3</summary>
 
-#### Настройки приведены для R-1, для R-3 сделаны аналогичные настройки.
+#### Ниже приведена часть настроек R-3, полные настройки можно посмотреть в файле конфигукации.
+``
+Минимальная длинна пароля сознатнельно сделана 6 знаков т.к. в домашней работе стоит задача настроить сам функцонал.
+``
 
 [файлы конфигурации](./conf/README.md)
 
 ```
-parser view admin1
- secret 5 $1$sZVq$8DX1RA8kOOlWrcGstrCef0
- commands exec include all configure terminal
- commands exec include configure
- commands exec include all show
-!
-parser view admin2
- secret 5 $1$.oXY$Q8W9yCx8Rd9M5eH/rm3Vl/
- commands exec include all show
-!
-parser view tech
- secret 5 $1$4.//$5rfowVsKo6IRlMB/ib/HA1
- commands exec include show ip interface brief
- commands exec include show ip interface
- commands exec include show ip
- commands exec include show version
- commands exec include show parser view
- commands exec include show parser
- commands exec include show interfaces
- commands exec include show
+auto secure
 
 ```
 </details>
@@ -151,195 +130,113 @@ parser view tech
 ### Проверка результатов настройки:
 
 <details>
-<summary>Проверка связанности и маршутизации</summary
+<summary>Подключаемся по ssh к R-3</summary
 
 ``
-Ping между узлами VPC-A, VPC-C
+Подключенаемся с syslog сервера
 ``
 ```
-VPC-A> ping 192.168.3.3 -c 4
+# ssh -l Maxim 3.3.3.3 -oKexAlgorithms=+diffie-hellman-group1-sha1
+The authenticity of host '3.3.3.3 (3.3.3.3)' can't be established.
+RSA key fingerprint is SHA256:i6G4xzCWL/r6MJiicgqL2jajiv3ryWbXXJbkFkbMKiA.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '3.3.3.3' (RSA) to the list of known hosts.
+Password:
+ LOGIN or LEAVE, ACCESS is DENIED!!!
+R-3>en
+Password:
+R-3#show runn
+Building configuration...
 
-84 bytes from 192.168.3.3 icmp_seq=1 ttl=61 time=1.572 ms
-84 bytes from 192.168.3.3 icmp_seq=2 ttl=61 time=1.438 ms
-84 bytes from 192.168.3.3 icmp_seq=3 ttl=61 time=1.829 ms
-84 bytes from 192.168.3.3 icmp_seq=4 ttl=61 time=2.012 ms
-```
-``
-Trace между узлами VPC-A, VPC-C
-``
-```
-VPC-A> trace 192.168.3.3 -P 1
-trace to 192.168.3.3, 8 hops max (ICMP), press Ctrl+C to stop
- 1   192.168.1.1   0.620 ms  0.469 ms  0.470 ms
- 2   10.1.1.2   0.903 ms  0.752 ms  0.828 ms
- 3   10.2.2.2   1.034 ms  1.001 ms  1.038 ms
- 4   192.168.3.3   1.645 ms  1.333 ms  1.376 ms
+Current configuration : 3611 bytes
+!
+! No configuration change since last restart
+!
+version 15.4
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service sequence-numbers
+!
+hostname R-3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+security authentication failure rate 10 log
+security passwords min-length 6
+logging console critical
+logging monitor errors
+enable secret 5 $1$xIYo$N42BjPBsB6NrpfKL8jLe3/
+enable password 7 0229104E182A0E237E5B
+!
+aaa new-model
+!
+!
+aaa authentication login local_auth local
+!
+!
 
-VPC-A>
+R-3#Connection to 3.3.3.3 closed by remote host.
+Connection to 3.3.3.3 closed.
 
 ```
-``
-R-1 show ip route ospf
-``
-```
-R-1#             show ip route ospf | beg Gateway
-Gateway of last resort is not set
 
-      2.0.0.0/32 is subnetted, 1 subnets
-O        2.2.2.2 [110/11] via 10.1.1.2, 04:01:35, Ethernet0/0
-      3.0.0.0/32 is subnetted, 1 subnets
-O        3.3.3.3 [110/21] via 10.1.1.2, 03:56:26, Ethernet0/0
-      10.0.0.0/8 is variably subnetted, 3 subnets, 2 masks
-O        10.2.2.0/30 [110/20] via 10.1.1.2, 04:01:35, Ethernet0/0
-O     192.168.3.0/24 [110/30] via 10.1.1.2, 03:49:44, Ethernet0/0
 
-```
-``
-R-2 show ip route ospf
-``
-```
-R-2#show ip route ospf | beg Gateway
-Gateway of last resort is not set
-
-      1.0.0.0/32 is subnetted, 1 subnets
-O        1.1.1.1 [110/11] via 10.1.1.1, 04:05:33, Ethernet0/2
-      3.0.0.0/32 is subnetted, 1 subnets
-O        3.3.3.3 [110/11] via 10.2.2.2, 04:01:25, Ethernet0/3
-O     192.168.1.0/24 [110/20] via 10.1.1.1, 03:51:48, Ethernet0/2
-O     192.168.3.0/24 [110/20] via 10.2.2.2, 03:54:42, Ethernet0/3
-R-2#
-```
-``
-R-3 show ip route ospf
-``
-```
-R-3#show ip route ospf | beg Gateway
-Gateway of last resort is not set
-
-      1.0.0.0/32 is subnetted, 1 subnets
-O        1.1.1.1 [110/21] via 10.2.2.1, 04:00:18, Ethernet0/0
-      2.0.0.0/32 is subnetted, 1 subnets
-O        2.2.2.2 [110/11] via 10.2.2.1, 04:00:18, Ethernet0/0
-      10.0.0.0/8 is variably subnetted, 3 subnets, 2 masks
-O        10.1.1.0/30 [110/20] via 10.2.2.1, 04:00:18, Ethernet0/0
-O     192.168.1.0/24 [110/30] via 10.2.2.1, 03:50:36, Ethernet0/0
-R-3#
-```
 </details>
 </summary>
 
 <details>
-<summary>Проверка административных ролей</summary
+<summary>Проверка работы NTP Syslog SNMP на примере R-1</summary
 
 ``
-Проверка проводится на R-1
+NTP
 ``
+```
+R-1#show ntp status
+Clock is synchronized, stratum 3, reference is 7.7.7.7
+nominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**10
+ntp uptime is 781200 (1/100 of seconds), resolution is 4000
+reference time is E762846F.E147B080 (14:28:47.880 MSK Fri Jan 6 2023)
+clock offset is -3.9638 msec, root delay is 6.44 msec
+root dispersion is 54.81 msec, peer dispersion is 3.69 msec
+loopfilter state is 'CTRL' (Normal Controlled Loop), drift is -0.000000033 s/s
 
 ```
-R-1>en
-Password:
-R-1#enable view admin1
-Password:
-
-R-1#show parser view
-Current view is 'admin1'
-
-R-1#?
-Exec commands:
-  configure   Enter configuration mode
-  credential  load the credential info from file system
-  do-exec     Mode-independent "do-exec" prefix support
-  enable      Turn on privileged commands
-  exit        Exit from the EXEC
-  show        Show running system information
-
-R-1#show ?
-  aaa                       Show AAA values
-  access-expression         List access expression
-  access-lists              List access lists
-  acircuit                  Access circuit info
-  adjacency                 Adjacent nodes
-  aliases                   Display alias commands
-  alps                      Alps information
-  appfw                     Application Firewall information
-  application               Application Routing
-  archive                   Archive functions
-  arp                       ARP table
-  async                     Information on terminal lines used as router
-                            interfaces
-  authentication            Shows Auth Manager registrations or sessions
-  auto                      Show Automation Template
-  backhaul-session-manager  Backhaul Session Manager information
-  backup                    Backup status
-  banner                    Display banner information
-  beep                      Show BEEP information
-  bfd                       BFD protocol info
-  bgp                       BGP information
-  bootvar                   Boot and related environment variable
-
-R-1#
-
+``
+Syslog проверим логи на удалённом сервере 7.7.7.7
+``
+```
+# tail -f /data/syslog/1.1.1.1/2023_01_syslog.log
+Jan  6 13:24:18 one.one.one.one 54: 000051: Jan  6 10:24:17: %PARSER-5-CFGLOG_LOGGEDCMD: User:console  logged command:ip ssh authentication-retries 2
+Jan  6 13:24:18 one.one.one.one 55: 000052: Jan  6 10:24:17: %PARSER-5-CFGLOG_LOGGEDCMD: User:console  logged command:ip ssh logging events
+Jan  6 13:24:20 one.one.one.one 56: 000053: Jan  6 10:24:19: %PARSER-5-CFGLOG_LOGGEDCMD: User:console  logged command:ip ssh version 2
+Jan  6 13:24:40 one.one.one.one 57: 000054: Jan  6 10:24:39: %SYS-5-CONFIG_I: Configured from console by console
+Jan  6 13:36:07 one.one.one.one 58: 000055: Jan  6 10:36:06: %PARSER-5-CFGLOG_LOGGEDCMD: User:console  logged command:!exec: enable
+Jan  6 14:20:39 one.one.one.one 59: 000056: Jan  6 11:20:38: %PARSER-5-CFGLOG_LOGGEDCMD: User:console  logged command:!exec: enable
+Jan  6 14:20:51 one.one.one.one 60: 000057: Jan  6 11:20:50: %PARSER-5-CFGLOG_LOGGEDCMD: User:console  logged command:snmp-server community * ro
+Jan  6 14:20:51 one.one.one.one 61: 000058: Jan  6 11:20:50: %PARSER-5-CFGLOG_LOGGEDCMD: User:console  logged command:snmp-server host 7.7.7.7 version 2c *
+Jan  6 14:20:54 one.one.one.one 62: 000059: Jan  6 11:20:53: %SYS-5-CONFIG_I: Configured from console by console
+Jan  6 14:39:02 one.one.one.one 63: 000060: Jan  6 11:39:01: %PARSER-5-CFGLOG_LOGGEDCMD: User:console  logged command:!exec: enable
 
 ```
-
+``
+SNMP
+``
 ```
-R-1#enable view admin2
-Password:
-
-R-1#show  parser view
-Current view is 'admin2'
-
-R-1#?
-Exec commands:
-  credential  load the credential info from file system
-  do-exec     Mode-independent "do-exec" prefix support
-  enable      Turn on privileged commands
-  exit        Exit from the EXEC
-  show        Show running system information
-
-R-1#
-
+# /usr/bin/snmpwalk -v2c -c OtusLabRO 1.1.1.1
+iso.3.6.1.2.1.1.1.0 = STRING: "Cisco IOS Software, Linux Software (I86BI_LINUX-ADVENTERPRISEK9-M), Version 15.4(2)T4, DEVELOPMENT TEST SOFTWARE
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2015 by Cisco Systems, Inc.
+Compiled Thu 08-Oct-15 21:21 by prod_re+"
+iso.3.6.1.2.1.1.2.0 = OID: iso.3.6.1.4.1.9.1.1
+iso.3.6.1.2.1.1.3.0 = Timeticks: (797708) 2:12:57.08
+iso.3.6.1.2.1.1.4.0 = ""
+iso.3.6.1.2.1.1.5.0 = STRING: "R-1.otuslab.ru"
 ```
-
-```
-R-1#enable view tech
-Password:
-
-R-1#show  parser view
-Current view is 'tech'
-
-R-1#?
-Exec commands:
-  credential  load the credential info from file system
-  do-exec     Mode-independent "do-exec" prefix support
-  enable      Turn on privileged commands
-  exit        Exit from the EXEC
-  show        Show running system information
-
-R-1#show ?
-  banner      Display banner information
-  disk0:      display information about disk0: file system
-  disk1:      display information about disk1: file system
-  interfaces  Interface status and configuration
-  ip          IP information
-  parser      Display parser information
-  unix:       display information about unix: file system
-  version     System hardware and software status
-
-R-1#show ip interface brief
-Interface                  IP-Address      OK? Method Status                Protocol
-Ethernet0/0                10.1.1.1        YES manual up                    up
-Ethernet0/1                192.168.1.1     YES manual up                    up
-Ethernet0/2                unassigned      YES unset  administratively down down
-Ethernet0/3                unassigned      YES unset  administratively down down
-Loopback0                  1.1.1.1         YES manual up                    up
-R-1#show ip route
-            ^
-% Invalid input detected at '^' marker.
-
-R-1#
-```
-
-
 </details>
 </summary>
