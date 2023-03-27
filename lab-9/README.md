@@ -56,7 +56,10 @@ sniff("eth0")
 
 </details>
 
-##### На компьютере атакующего
+
+##### На компьютере атакующего.
+
+
 <details>
 <summary>Конфигурация</summary>
 
@@ -67,7 +70,7 @@ sniff("eth0")
 </details>
 
 <details>
-<summary>запускаем arpspoof</summary>
+<summary>Запускаем arpspoof</summary>
 
   ![alt-текст](/lab-9/img/arpspoof.png)
 </summary>
@@ -76,7 +79,7 @@ sniff("eth0")
 
 
 <details>
-<summary>запускаем sslstrip</summary>
+<summary>Запускаем sslstrip</summary>
 
   ![alt-текст](/lab-9/img/sslstrip_start.png)
 </summary>
@@ -84,7 +87,7 @@ sniff("eth0")
 </details>
 
 <details>
-<summary>результат работы скрипта</summary>
+<summary>Результат работы скрипта</summary>
 
   ![alt-текст](/lab-9/img/packetsniff.py.png)
 </summary>
@@ -98,8 +101,11 @@ sniff("eth0")
 </summary>
 
 </details>
+
+###### Сайт по https на компьютере жертвы благополучно открывается именно по https
+
 <details>
-<summary>результат pscketsniff с ручным вводом адреса</summary>
+<summary>Результат pscketsniff с ручным вводом адреса</summary>
 
 ##### Если вручную забить адрес сайта http://klavogonki.ru , то Url появляется в выводе скрипта.
 
@@ -107,7 +113,9 @@ sniff("eth0")
 </summary>
 
 </details>
+
 ##### На компьютере жертвы
+
 <details>
 <summary>Конфигурация</summary>
 
@@ -117,7 +125,7 @@ sniff("eth0")
 </details>
 
 <details>
-<summary>site-http</summary>
+<summary>http</summary>
 
 ##### Если вручную забить адрес сайта http://...... , то только белая страница видна
 
