@@ -2,9 +2,9 @@
 
 ##### Задача.
 
-- Client1 может обратиться к Client2/Client3 через icmp и http.
-- Client 3 может обратиться только к Client2 через icmp.
-- Client 2 сам не может обратиться никуда.
+- VPC-1 может обратиться к VPC-2, VPC-3 через icmp и http.
+- VPC-3 может обратиться только к VPC-2 через icmp.
+- VPC-2 сам не может обратиться никуда.
 
 <details>
 <summary>Конфигурация сети</summary>
@@ -291,11 +291,12 @@ VPC-2> ping 10.101.255.2 -1 -c 3
 10.101.255.2 icmp_seq=2 timeout
 10.101.255.2 icmp_seq=3 timeout
 
-VPC-2> ping 10.102.255.2 -1 -c 3
+VPC-2> ping 10.102.255.1 -1 -c 3
 
-10.102.255.2 icmp_seq=1 ttl=64 time=0.001 ms
-10.102.255.2 icmp_seq=2 ttl=64 time=0.001 ms
-10.102.255.2 icmp_seq=3 ttl=64 time=0.001 ms
+84 bytes from 10.102.255.1 icmp_seq=1 ttl=255 time=0.507 ms
+84 bytes from 10.102.255.1 icmp_seq=2 ttl=255 time=0.390 ms
+84 bytes from 10.102.255.1 icmp_seq=3 ttl=255 time=0.491 ms
+
 
 VPC-2> ping 10.103.255.2 -1 -c 3
 
